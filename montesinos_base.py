@@ -208,6 +208,9 @@ class edgepath:
             return 0
         return 1
 
+    def clone(self):
+        return edgepath(self.tangle, self.path)
+
 # a branched surface is a collection of edgepaths one for each tangle.
 # The tangles are regarded as cyclically ordered, and if b is
 # branched_surface, b[i] is the (i % n)th edgepath, where n = num of
@@ -371,6 +374,11 @@ class branched_surface:
 
     def reflect(self):
         self.edgepaths.reverse()
+
+    def r_values(self):
+        ans = [E.r_value for E in self.edgepaths]
+        ans.sort()
+        return ans
         
     # gets ith path with cycle ordering
     def __getitem__(self, i):

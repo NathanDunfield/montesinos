@@ -474,7 +474,7 @@ def apply_proposition_2_9(surface, sum):
 
     return 0
 
-def create_type_II_and_III_surfaces(tangles):
+def create_type_II_and_III_surfaces(tangles, fix = False):
     path_poss = []
     for i in range(0, len(tangles)):
         path_poss.append( create_all_edgepaths_to_left_edge_of_T(i, tangles) )
@@ -509,8 +509,20 @@ def create_type_II_and_III_surfaces(tangles):
         
         # Create corresponding type III surface
         # (edgepaths continued to <1/0> )
-        
-        surface = branched_surface(paths, "III", frac(1,0))
+
+        if fix:
+            extended_paths = []
+            for path in paths:
+                new_path = path.clone()
+                # correct the path, and recompute reversibility 
+                new_path.path = [vertex_of_D(1,0)] + path.path
+                new_path.completely_reversible = new_path.decide_reversibility()
+                # now restore the path, as other parts of the program, like computing the slope depend on it.  
+                new_path.path = path.path
+                extended_paths.append(new_path)
+        else:
+            extended_paths = paths
+        surface = branched_surface(extended_paths, "III", frac(1,0))
 
         # apply proposition 2.5 to determine whether the branched
         # surface carries an incompressible surface
@@ -557,12 +569,12 @@ def no_integer_tangles(tangles):
             
 # the main function:
 
-def compute_surfaces(tangles):
+def compute_surfaces(tangles, fix = False):
     if not defines_knot(tangles):
         raise ValueError, "tangles give a link, not a knot"
     if not no_integer_tangles(tangles):
         raise ValueError, "no integer tangles allowed"
-    surfaces = create_type_I_surfaces(tangles) + create_type_II_and_III_surfaces(tangles)
+    surfaces = create_type_I_surfaces(tangles) + create_type_II_and_III_surfaces(tangles, fix)
     seifert_twist = comp_Seifert_twist(tangles)
     for surface in surfaces:
         surface.comp_slope(seifert_twist)
