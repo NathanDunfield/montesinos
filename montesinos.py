@@ -8,11 +8,11 @@
 # see the file montesinos_bdry.py (which is what you would
 # use just to get output).  
 #
-# Written by Nathan Dunfield <nathand@math.harvard.edu>
+# Written by Nathan Dunfield <nathan@dunfield.info>
 #
 # Version 1.0. Dec 4, 1998.
 # Version 1.1  Nov 24, 2002.  Made to work with Python 2.*
-
+# Vertion 1.2  Jan 2, 2007.   Fixed several bugs in the implementation of Props 2.5, 2.6(2) and 2.7(3).
 
 from montesinos_base import *
 
@@ -386,7 +386,7 @@ def ones_have_opp_sign_from_neighbors(surface):
 # Uses Cor 2.4 and Prop. 2.6-7 to check compressiblity.  Applys to
 # systems contained in T with no vertical edges (type I and certain type II systems)
 
-def test_when_no_vertical_edges(surface, fix = False):
+def test_when_no_vertical_edges(surface, fix = True):
     n = len(surface.edgepaths)
 
     # test for constant edgepaths
@@ -488,7 +488,7 @@ def apply_proposition_2_9(surface, sum):
 
     return 0
 
-def create_type_II_and_III_surfaces(tangles, fix = False):
+def create_type_II_and_III_surfaces(tangles, fix = True):
     path_poss = []
     for i in range(0, len(tangles)):
         path_poss.append( create_all_edgepaths_to_left_edge_of_T(i, tangles) )
@@ -523,6 +523,11 @@ def create_type_II_and_III_surfaces(tangles, fix = False):
         
         # Create corresponding type III surface
         # (edgepaths continued to <1/0> )
+        #
+        # The original version of this program ignored the last
+        # segment to <1/0> in determining whether the path is
+        # completely reversible.  I've hacked in something to fix
+        # this, but it's a little ugly.   
 
         if fix:
             extended_paths = []
@@ -583,7 +588,7 @@ def no_integer_tangles(tangles):
             
 # the main function:
 
-def compute_surfaces(tangles, fix = False):
+def compute_surfaces(tangles, fix = True):
     if not defines_knot(tangles):
         raise ValueError, "tangles give a link, not a knot"
     if not no_integer_tangles(tangles):
