@@ -384,9 +384,9 @@ def ones_have_opp_sign_from_neighbors(surface):
     return 1
                                           
 # Uses Cor 2.4 and Prop. 2.6-7 to check compressiblity.  Applys to
-# systems contained in T with no vertical edges (type I and II systems)
+# systems contained in T with no vertical edges (type I and certain type II systems)
 
-def test_when_no_vertical_edges(surface):
+def test_when_no_vertical_edges(surface, fix = False):
     n = len(surface.edgepaths)
 
     # test for constant edgepaths
@@ -420,10 +420,17 @@ def test_when_no_vertical_edges(surface):
                                 return 0
                     else:
                         for i in range(0, n-1):
-                            if same_ending_point_and_triangle(surface[i], surface[-1] ):
-                                # case 2(b).  Are n - 2 paths with r = 1 comp. reversible?  Yes -> comp.
-                                if surface.num_reversible(range(0, n-1)) >= n - 2:
-                                    return 0
+                            if fix:
+                                final_d = abs(surface[-1][0].q())
+                                if final_r == (final_d + 1):
+                                    if surface.num_reversible(range(0, n-1)) >= n - 2:
+                                        return 0
+                            else:
+                                if same_ending_point_and_triangle(surface[i], surface[-1] ):
+                                    # case 2(b).  Are n - 2 paths with r = 1 comp. reversible?  Yes -> comp.
+
+                                    if surface.num_reversible(range(0, n-1)) >= n - 2:
+                                        return 0
 
                            
 
@@ -436,9 +443,16 @@ def test_when_no_vertical_edges(surface):
                 if surface.num_reversible() == n: return 0  # (b)
                 
             else: #case(3)
-                if (same_ending_point_and_triangle(surface[-2], surface[-1]) and
-                    surface.num_reversible(range(0, n-1)) == n - 1):
-                    return 0  # (b)
+                if fix:
+                    final_d = abs(surface[-1][0].q())
+                    if (final_r == final_d + 2 and
+                        surface.num_reversible(range(0, n-1)) == n - 1):
+                        return 0 # (b)
+
+                else:
+                    if (same_ending_point_and_triangle(surface[-2], surface[-1]) and
+                        surface.num_reversible(range(0, n-1)) == n - 1):
+                        return 0  # (b)
 
     return 1
         
@@ -498,7 +512,7 @@ def create_type_II_and_III_surfaces(tangles, fix = False):
         # incompressible surface.  
         
         if(sum_of_endpoints ==  0):
-            surface.carries_incompressible = test_when_no_vertical_edges(surface)
+            surface.carries_incompressible = test_when_no_vertical_edges(surface, fix)
         else:
             # have to adjust the twist in this case
             surface.twist = surface.twist + 2* sum_of_endpoints
