@@ -1,4 +1,4 @@
-# Written by Nathan Dunfield <nathand@math.uchicago.edu>
+# Written by Nathan Dunfield <nathan@dunfield.info>
 #
 # Version 1.0.  Dec 4, 1998.
 
