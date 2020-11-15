@@ -10,9 +10,10 @@
 #
 # Written by Nathan Dunfield <nathan@dunfield.info>
 #
-# Version 1.0. Dec 4, 1998.
+# Version 1.0. Dec  4, 1998.
 # Version 1.1  Nov 24, 2002.  Made to work with Python 2.*
-# Vertion 1.2  Jan 2, 2008.   Fixed several bugs in the implementation of Props 2.5, 2.6(2) and 2.7(3).
+# Version 1.2  Jan  2, 2008.  Fixed bugs in the implementation of Props 2.5, 2.6(2) and 2.7(3).
+# Version 1.3  Nov 14, 2020.  Made work with Python 3.*
 #
 # This code is released into the public domain.
 

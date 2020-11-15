@@ -1,6 +1,8 @@
 # Written by Nathan Dunfield <nathan@dunfield.info>
 #
-# Version 1.0.  Dec 4, 1998.
+# Version 1.0.  Dec  4, 1998.
+# Version 1.3   Nov 14, 2020. Made work with Python 3.*
+
 
 from gcd_tools import *
 
@@ -22,7 +24,7 @@ class vertex_of_D:
 
     def __eq__(self, other):
         if not isinstance(other, vertex_of_D):
-            raise ValueError
+            return False
         return self.frac == other.frac
 
     def __lt__(self, other):
@@ -59,7 +61,6 @@ class vertex_of_D:
     def leftward_neighbors(self):
         # The two vertices to the left of <p/q> are <r/s>
         # where sp - rq = +/-1 and s < q
-        print(self.frac)
         p, q = self.frac.t, self.frac.b
         g, s, r = euclidean_algorithm(p, q)   # 1 = sp + rq
         if g != 1 or q <= 1: raise ValueError("bad vertex %i,%i" % (p,q))
@@ -109,7 +110,7 @@ class interior_of_edge_of_D:
 
     def __eq__(self, o):
         if not isinstance(o, interior_of_edge_of_D):
-            raise ValueError
+            return False
         return self.pq == o.pq and self.rs == o.rs and self.km == o.km
 
     # min num arcs needed to realize system
@@ -305,7 +306,7 @@ class branched_surface:
             if len(path) != 1:
                 # First edge is special case:
                 if isinstance(path[0], interior_of_edge_of_D):
-                    num_saddles = num_saddles + path[0].km.t * sheets / path[0].km.b
+                    num_saddles = num_saddles + path[0].km.t * sheets // path[0].km.b
                 else:
                     num_saddles = num_saddles + sheets
                 # rest of edges
@@ -351,9 +352,9 @@ class branched_surface:
                 k, m = v.km.t, v.km.b
                 # is on horizontal edge <p/q, p/q>
                 if v.pq == v.rs:
-                    C = (sheets/k)*(k*(v.q() + 1) + (m - k)*v.q())
+                    C = (sheets//k)*(k*(v.q() + 1) + (m - k)*v.q())
                 else:
-                    C = k*sheets/m*(v.q() + 1) + (m - k)*sheets/m*(v.s() + 1)
+                    C = k*sheets//m*(v.q() + 1) + (m - k)*sheets//m*(v.s() + 1)
             else:
                 C = (v.q() + 1)*sheets
 
@@ -431,6 +432,9 @@ class conway_sphere:
     num_sheets = "Conway Sphere"
     euler_char = -2
     from_non_iso_solution = 0
+
+    def __repr__(self):
+        return "<montesinos_base.conway_sphere>"
 
 # Takes a list of lists [L_1, ... , L_n] and outputs a list consisting
 # of all points in the cartesian product of the L1, i.e. every list

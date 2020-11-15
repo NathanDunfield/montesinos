@@ -10,7 +10,9 @@
 #
 # Written by Nathan Dunfield <nathand@math.uchicago.edu>
 #
-# Version 1.0.  Dec 4, 1998.
+# Version 1.0.  Dec  4, 1998.
+# Version 1.3.  Nov 14, 2020. Made work with Python 3.*
+
 
 from two_bridge import branched_surfaces, slopes, print_surfaces
 import sys

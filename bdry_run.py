@@ -16,16 +16,17 @@
 #    Windoze: Double click the file bdry_run.py. If this doesn't
 #     work, try the instructions for MacOS.
 #
-# Version 1.0   Dec 4, 1998
-# Version 1.1.  Jan 29, 1999. Added more graceful handling of improper input.
-# Version 1.1.1 Oct 16, 2000. Changed MacOS instructions. 
+# Version 1.0   Dec  4, 1998.
+# Version 1.1   Jan 29, 1999. Added more graceful handling of improper input.
+# Version 1.1.1 Oct 16, 2000. Changed MacOS instructions.
+# Version 1.3   Nov 14, 2020. Made work with Python 3.*
 #
 # Written by Nathan Dunfield <nathand@math.harvard.edu>
 
 import os, re, sys
 import two_bridge, montesinos, gcd_tools
 
-out = sys.stdout.write
+out = print
 get_input = sys.stdin.readline
 
 # ask user Question and get back a one character response which must be from Answers
@@ -42,7 +43,7 @@ def ask_question(Question, Answers):
 # begin main program
 
 out("This program computes the boundary slopes of a Montesinos knot.\n")
-out("Written by Nathan Dunfield <nathand@math.harvard.edu>\n\n")
+out("Written by Nathan Dunfield <nathan@dunfield.info>\n\n")
 while 1:
     inp = ask_question("Do you want to do a t)wo-bridge knot or a m)ontesinos knot?: ", "tm")
     if inp == 't':

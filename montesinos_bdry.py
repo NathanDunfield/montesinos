@@ -10,8 +10,11 @@
 #
 # Written by Nathan Dunfield <nathand@math.uchicago.edu>
 #
-# Version 1.0.  Dec 4, 1998.
+# Version 1.0.  Dec  4, 1998.
 # Version 1.1.  Jan 29, 1999. Added more graceful handling of improper input
+# Version 1.3.  Nov 14, 2020. Made work with Python 3.*
+
+
 
 import os, sys, re, getopt
 from montesinos import compute_surfaces, compute_boundary_slopes,  essential_info, defines_knot, no_integer_tangles
