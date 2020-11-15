@@ -23,36 +23,36 @@ def main():
             optlist.append(arg)
         else:
             arg_list.append(arg)
-	    
+
     try:
-	p, q = map(int, arg_list)
+        p, q = map(int, arg_list)
     except:
-      	print "Must supply two integers.\n"
-      	help_then_exit()
+        print("Must supply two integers.\n")
+        help_then_exit()
 
     if not 0 < p < q:
-        print "Need 0 < p < q, sorry"
+        print("Need 0 < p < q, sorry")
         sys.exit(0)
-       	
+
     if not optlist:
-	str = "K(%d/%d) %s\n" % (p, q, slopes(branched_surfaces(p,q)))
-	sys.stdout.write(str)
-	sys.stdout.flush()
+        str = "K(%d/%d) %s\n" % (p, q, slopes(branched_surfaces(p,q)))
+        sys.stdout.write(str)
+        sys.stdout.flush()
     else:
-	surfaces = (branched_surfaces(p,q))
-	str = "K(%d/%d) %s\n\n" % (p, q, slopes(branched_surfaces(p,q)))
-	sys.stdout.write(str)
-	print_surfaces(surfaces)
-		    
+        surfaces = (branched_surfaces(p,q))
+        str = "K(%d/%d) %s\n\n" % (p, q, slopes(branched_surfaces(p,q)))
+        sys.stdout.write(str)
+        print_surfaces(surfaces)
+
 def help_then_exit():
-    print "usage: %s [-f] p q  " % sys.argv[0]
-    print "   computes the boundary slopes of the 2-bridge knot p/q. If"
-    print "   the -f option is not given, the program prints the name of"
-    print "   the knot followed by a list of boundary slopes.  If -f is "
-    print "   given, the program follows this information with a list of"
-    print "   the continued fraction expansions corresponding to each"
-    print "   branched surface which carries an incompressible surface,"
-    print "   followed by the slope. "
+    print("usage: %s [-f] p q  " % sys.argv[0])
+    print("   computes the boundary slopes of the 2-bridge knot p/q. If")
+    print("   the -f option is not given, the program prints the name of")
+    print("   the knot followed by a list of boundary slopes.  If -f is ")
+    print("   given, the program follows this information with a list of")
+    print("   the continued fraction expansions corresponding to each")
+    print("   branched surface which carries an incompressible surface,")
+    print("   followed by the slope. ")
     sys.exit(0)
 
 

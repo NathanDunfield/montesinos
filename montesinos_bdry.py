@@ -39,20 +39,20 @@ def main():
             try:
                 tangles.append( string_to_frac(arg))
             except ValueError:
-                print "%s is not a fraction or an option\n" % arg
-                print help
+                print("%s is not a fraction or an option\n" % arg)
+                print(help)
                 sys.exit(0)
-         
+
     if len(tangles) < 3:
-        print "Need at least 3 tangles, else use two-bridge program\n"
-        print help
+        print("Need at least 3 tangles, else use two-bridge program\n")
+        print(help)
         sys.exit(0)
 
     if not defines_knot(tangles):
-        print "Tangles give a link, not a knot."
+        print("Tangles give a link, not a knot.")
         sys.exit(0)
     if not no_integer_tangles(tangles):
-        print "No integer tangles allowed."
+        print("No integer tangles allowed.")
         sys.exit(0)
 
     surfaces = compute_surfaces(tangles)
@@ -72,7 +72,7 @@ def main():
 
     sys.stdout.flush()
 
-		    
+
 main()
- 
+
 

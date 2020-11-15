@@ -6,7 +6,7 @@
 #
 # For an example of the use of the main function in this file
 # see the file montesinos_bdry.py (which is what you would
-# use just to get output).  
+# use just to get output).
 #
 # Written by Nathan Dunfield <nathan@dunfield.info>
 #
@@ -14,7 +14,7 @@
 # Version 1.1  Nov 24, 2002.  Made to work with Python 2.*
 # Vertion 1.2  Jan 2, 2008.   Fixed several bugs in the implementation of Props 2.5, 2.6(2) and 2.7(3).
 #
-# This code is released into the public domain.  
+# This code is released into the public domain.
 
 from montesinos_base import *
 
@@ -30,9 +30,9 @@ def continue_path_wo_changing_in_reduced(path):
             path = [a] + path[ : ]
         else:
             path = [b] + path[ : ]
-            
+
     return path
-        
+
 def paths_to_infinity_using_only_one_edge_of_reduced_diagram(tangle):
     cont = continue_path_wo_changing_in_reduced
     v = vertex_of_D(tangle)
@@ -47,19 +47,19 @@ def paths_to_infinity_using_only_one_edge_of_reduced_diagram(tangle):
             return cont( [ b, v] )
 
 def to_left_edge_via_odd_denominators(tangle):
-        v = vertex_of_D(tangle)
-        a, b = v.leftward_neighbors()
-        if a.reduced().b == 1:
-            return  continue_path_wo_changing_in_reduced( [a, v] )
-        else:
-             return  continue_path_wo_changing_in_reduced( [b, v] )
-        
+    v = vertex_of_D(tangle)
+    a, b = v.leftward_neighbors()
+    if a.reduced().b == 1:
+        return  continue_path_wo_changing_in_reduced( [a, v] )
+    else:
+        return  continue_path_wo_changing_in_reduced( [b, v] )
+
 # follows top of page 461
 
 def comp_Seifert_twist(tangles):
     n = len(tangles)
     even_qi_exists = 0
-    
+
     for i in range(0, n):
         if tangles[i].b % 2 == 0:
             even_qi_exists = 1
@@ -72,14 +72,14 @@ def comp_Seifert_twist(tangles):
         # even
 
         paths_to_infinity = []
-        for j in range(0, i) + range(i+1, n):
+        for j in list(range(0, i)) + list(range(i+1, n)):
             paths_to_infinity.append(
                 paths_to_infinity_using_only_one_edge_of_reduced_diagram(tangles[j]))
 
         num_of_odd_penultimate_slopes = 0
         for path in paths_to_infinity:
             if path[0].p() % 2 == 1:
-                 num_of_odd_penultimate_slopes = num_of_odd_penultimate_slopes + 1
+                num_of_odd_penultimate_slopes = num_of_odd_penultimate_slopes + 1
 
         for path in paths_to_infinity_using_only_one_edge_of_reduced_diagram(tangles[i]):
             if (path[0].p() + num_of_odd_penultimate_slopes) % 2 == 0:
@@ -99,16 +99,16 @@ def comp_Seifert_twist(tangles):
         for path in paths:
             sum_of_endpoints = sum_of_endpoints + path[0].p()
         surface.twist = surface.twist + 2* sum_of_endpoints
-          
+
     return surface.twist
 
 # returns the trees T_i.  Differs from paper in that if a tangle does
 # not have maximum denominator, the root of the tree extends all the
-# way back to u = 1.  When the function first creates a node, 
+# way back to u = 1.  When the function first creates a node,
 
 def build_trees(tangles, max_denominator):
     trees = []
-    
+
     # create root and (sometimes) first edge
     for t in tangles:
         if t.b == max_denominator:
@@ -129,13 +129,13 @@ def build_trees(tangles, max_denominator):
 # takes node and extends tree recursively to left edge of T
 
 def extend_tree(n):
-    if n.vertex.u() == 0:  
+    if n.vertex.u() == 0:
         return   #allready to left edge of T
-    
+
     left = n.vertex.leftward_neighbors()
     for i in [0,1]:
         v = left[i]
-        
+
         #check for minimality
         if n.back and n.back.vertex != n.vertex:
             if joined_by_edge(v, n.back.vertex):
@@ -148,9 +148,9 @@ def extend_tree(n):
 
 def print_tree(n, level = 0):
     if n:
-        print level*"\t",  n
+        print(level*"\t",  n)
         for i in [0,1]:
-            print_tree( n.leftward[i], level + 1)                    
+            print_tree( n.leftward[i], level + 1)
 
 # given a collection of edge created in create_type_I_surfaces,
 # creates the associated linear equation:
@@ -204,15 +204,15 @@ def create_type_I(edges, u):
 
         paths.append(edgepath(t, path))
 
-    return branched_surface(paths, "I", u)            
-     
+    return branched_surface(paths, "I", u)
+
 
 def create_type_I_surfaces(tangles):
     surfaces = []
-    
+
     max_denom = max( map( lambda x: x.b, tangles ))
     trees = build_trees(tangles, max_denom)
-    
+
     # We look at systems whose ending point has u coordinate in
     # [(k-2)/(k - 1), (k-1)/k] for k in [1, max_denom].  We keep a list
     # edges, indexed by the tangles, so that edge[i] is a list of
@@ -232,7 +232,7 @@ def create_type_I_surfaces(tangles):
     for k in range(max_denom, 1, -1):   # [max_denom, ... , 2]
         for edge_choices in product_of_lists(edges):
             a, b = create_equation(edge_choices)   #(sum of v cor over edges)  = a * u + b = 0
-            
+
             # if a == 0, there is either no solution, or a
             # non-isolated one.  In the latter case I will handle it
             # with as small of k as possible (i.e. at the leftmost
@@ -242,21 +242,21 @@ def create_type_I_surfaces(tangles):
             # become isolated, but I'm not sure this is the case.  At
             # worst I'm reporting multiple copies of the same surface, most
             # of which will be removed later.
-            
+
             if a == 0 and b == 0 and k != 2:  # if k == 2, handle this as a type II solution
                 u = frac (k-2,k-1)
                 surface = create_type_I(edge_choices, u)
                 surface.carries_incompressible = test_when_no_vertical_edges(surface)
                 surfaces.append(surface)
                 surface.from_non_iso_solution = 1
-      
+
             if  a != 0:
                 u = -b/a
                 if frac(k-2,k-1) <  u <= frac(k - 1, k):   # have solution in desired interval
                     surface = create_type_I(edge_choices, u)
                     surface.carries_incompressible = test_when_no_vertical_edges(surface)
                     surfaces.append(surface)
-      
+
         # change edges if necessary for decreasing k
 
         new_edges = []
@@ -283,16 +283,16 @@ def create_type_I_surfaces(tangles):
         if not match_found:
             final_surfaces.append(surface)
     return final_surfaces
-                                       
+
 def create_all_edgepaths_to_left_edge_of_T(tangle_num, tangles):
-    paths = [ [ vertex_of_D( tangles[tangle_num] ) ] ]         
+    paths = [ [ vertex_of_D( tangles[tangle_num] ) ] ]
     completed_paths = []
 
     while len(paths) > 0:
         new_paths = []
         for path in paths:
             for v in path[0].leftward_neighbors():
-                
+
                 # check if adding v to path would make a minimal path
 
                 if len(path) != 1 and  joined_by_edge(v, path[1]): continue
@@ -303,7 +303,7 @@ def create_all_edgepaths_to_left_edge_of_T(tangle_num, tangles):
                     new_paths.append( [v] + path )
 
         paths = new_paths[:]
-            
+
     final_paths = []
     for path in completed_paths:
         final_paths.append( edgepath(tangle_num, path))
@@ -330,8 +330,8 @@ def apply_cor_2_4(surface):
         if abs(r) == 1: number_of_ones = number_of_ones + 1
 
     if number_of_ones == n:
-            return 0
-        
+        return 0
+
     if number_of_ones ==  n - 1:
         for i  in range(0, n):
             if abs(surface[i].r_value ) != 1:
@@ -341,15 +341,15 @@ def apply_cor_2_4(surface):
     if number_of_ones == n - 2:
         for i in range(0,n):
             # because of def of surface, below valid even if i = n - 1
-            if  abs(surface[i].r_value ) == 2 and abs(surface[ i + 1 ].r_value) != 1:  
+            if  abs(surface[i].r_value ) == 2 and abs(surface[ i + 1 ].r_value) != 1:
                 surface.cycle_paths_so_last(i + 1)
                 return 0
-            if  abs(surface[i].r_value ) == 2 and abs(surface[ i - 1 ].r_value) != 1:  
+            if  abs(surface[i].r_value ) == 2 and abs(surface[ i - 1 ].r_value) != 1:
                 surface.cycle_paths_so_last(i)  # (1, ... ,1, r, 2)
                 surface.reflect()               # (2, r, 1, ...  1)
                 surface.cycle_paths_so_last(1)  # (1,...,1,2,r)
                 return 0
-            
+
 
     return 1
 
@@ -384,7 +384,7 @@ def ones_have_opp_sign_from_neighbors(surface):
             if surface[i - 1].r_value * surface[i].r_value > 0:
                 return 0
     return 1
-                                          
+
 # Uses Cor 2.4 and Prop. 2.6-7 to check compressiblity.  Applys to
 # systems contained in T with no vertical edges (type I and certain type II systems)
 
@@ -396,7 +396,7 @@ def test_when_no_vertical_edges(surface, fix = True):
     for i in range(0, n):
         if len(surface[i].path) == 1:
             return 1
-        
+
     if apply_cor_2_4(surface):
         return 1
 
@@ -415,11 +415,11 @@ def test_when_no_vertical_edges(surface, fix = True):
                 # the same ending point, as an edge with r = 1.  There
                 # is the poss that final_r ==1
 
-                    
+
                 if all_signs_alternate(surface):
                     if final_r == 1:
                         if  surface.num_reversible()  >= n - 2:
-                                return 0
+                            return 0
                     else:
                         for i in range(0, n-1):
                             if fix:
@@ -434,16 +434,16 @@ def test_when_no_vertical_edges(surface, fix = True):
                                     if surface.num_reversible(range(0, n-1)) >= n - 2:
                                         return 0
 
-                           
+
 
     else:    # r-values  are (1,...1,2,r) and we implement Prop 2.7
         if ones_have_opp_sign_from_neighbors(surface):
             if final_r == 2:  # case (1)
                 if surface.num_reversible() >= n - 1: return 0  #(a)
-                
+
             elif final_r == 4: # case (2)
                 if surface.num_reversible() == n: return 0  # (b)
-                
+
             else: #case(3)
                 if fix:
                     final_d = abs(surface[-1][0].q())
@@ -457,14 +457,14 @@ def test_when_no_vertical_edges(surface, fix = True):
                         return 0  # (b)
 
     return 1
-        
+
 # applys Prop 2.9 to the type II surface the sum of whose endpoints on
 # the left edge of T is sum.  Returns 1 if system carries an
 # incompressible surface, 0 otherwise.
 
 def apply_proposition_2_9(surface, sum):
-    e = sum/abs(sum)  # +/- 1
-    
+    e = sum//abs(sum)  # +/- 1
+
     # the system does not extend to one which carries an
     # incompressible surface if the cycle of r-values contains at
     # least one e and every e is separated from the next by e by
@@ -475,7 +475,7 @@ def apply_proposition_2_9(surface, sum):
     for i in range(0, len(surface.edgepaths)):
         if surface[i].r_value == e:
             e_found = 1
-            
+
     if not e_found: return 1
     for i in range(0, len(surface.edgepaths)):
         if  surface[i].r_value == e:
@@ -498,10 +498,10 @@ def create_type_II_and_III_surfaces(tangles, fix = True):
     # loop over all possible curve systems
 
     surfaces = []
-    
+
     for paths in product_of_lists(path_poss):
         # needed to determine incompressibility
-        
+
         sum_of_endpoints = 0
         for path in paths:
             sum_of_endpoints = sum_of_endpoints + path[0].p()
@@ -511,8 +511,8 @@ def create_type_II_and_III_surfaces(tangles, fix = True):
         surface = branched_surface(paths, "II", 0)
 
         # determine whether the branched surface carries an
-        # incompressible surface.  
-        
+        # incompressible surface.
+
         if(sum_of_endpoints ==  0):
             surface.carries_incompressible = test_when_no_vertical_edges(surface, fix)
         else:
@@ -522,23 +522,23 @@ def create_type_II_and_III_surfaces(tangles, fix = True):
 
         surfaces.append(surface)
         #print surface
-        
+
         # Create corresponding type III surface
         # (edgepaths continued to <1/0> )
         #
         # The original version of this program ignored the last
         # segment to <1/0> in determining whether the path is
         # completely reversible.  I've hacked in something to fix
-        # this, but it's a little ugly.   
+        # this, but it's a little ugly.
 
         if fix:
             extended_paths = []
             for path in paths:
                 new_path = path.clone()
-                # correct the path, and recompute reversibility 
+                # correct the path, and recompute reversibility
                 new_path.path = [vertex_of_D(1,0)] + path.path
                 new_path.completely_reversible = new_path.decide_reversibility()
-                # now restore the path, as other parts of the program, like computing the slope depend on it.  
+                # now restore the path, as other parts of the program, like computing the slope depend on it.
                 new_path.path = path.path
                 extended_paths.append(new_path)
         else:
@@ -554,7 +554,7 @@ def create_type_II_and_III_surfaces(tangles, fix = True):
             surface.carries_incompressible = 1
 
         surfaces.append(surface)
-        
+
     return surfaces
 
 # For checking if given tangle defines a knot
@@ -587,14 +587,14 @@ def no_integer_tangles(tangles):
         if tangle.b == 1:
             return 0
     return 1
-            
+
 # the main function:
 
 def compute_surfaces(tangles, fix = True):
     if not defines_knot(tangles):
-        raise ValueError, "tangles give a link, not a knot"
+        raise ValueError("tangles give a link, not a knot")
     if not no_integer_tangles(tangles):
-        raise ValueError, "no integer tangles allowed"
+        raise ValueError("no integer tangles allowed")
     surfaces = create_type_I_surfaces(tangles) + create_type_II_and_III_surfaces(tangles, fix)
     seifert_twist = comp_Seifert_twist(tangles)
     for surface in surfaces:
@@ -615,11 +615,11 @@ def compute_boundary_slopes(surfaces):
     slopes.sort()
     unique_slopes = [slopes[0]]
     for slope in slopes[1:]:
-        if slope != unique_slopes[-1]: 
+        if slope != unique_slopes[-1]:
             unique_slopes.append(slope)
-            
+
     return unique_slopes
-            
+
 # returns a list of tuples (slope, num_sheets, euler_char) about each
 # incompressible surface.
 
@@ -633,13 +633,3 @@ def essential_info(surfaces):
 
 if __name__ == "__main__":
     None
-
-        
-    
-
-
-
-
-
-
-

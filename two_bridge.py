@@ -25,7 +25,7 @@ class surface:
 def branched_surfaces(p, q):
     # check input
 
-    if not (0 < p < q): raise ValueError, "must have 0 < p < q"
+    if not (0 < p < q): raise ValueError("must have 0 < p < q")
 
     # Branched surfaces carrying incompressible surfaces correspond to
     # minimal paths in the heavy edges of the in Fig 5.  The union of
@@ -48,33 +48,33 @@ def branched_surfaces(p, q):
 
     surfaces = []
     for path in paths:
-	surfaces.append(surface_from_path(path, a))
-	
+        surfaces.append(surface_from_path(path, a))
+
     # We compute the slopes of the surfaces:
 
     twist = seifert_twist(surfaces)
-    
+
     for s in surfaces:
-   	compute_slope(s, twist)
+        compute_slope(s, twist)
 
     return surfaces
-   
+
 def print_surfaces(surfaces):
     for s in surfaces:
-	print s.expansion, s.slope
+        print(s.expansion, s.slope)
 
 # returns the list of boundary slopes of surfaces with no repeats
 
 def slopes(surfaces):
     slopes = []
     for s in surfaces:
-	slopes.append(s.slope)
+        slopes.append(s.slope)
 
     slopes.sort()
     unique_slopes = [slopes[0]]
     for slope in slopes[1:]:
-	if slope != unique_slopes[-1]: 
-	    unique_slopes.append(slope)
+        if slope != unique_slopes[-1]: 
+            unique_slopes.append(slope)
 
     return unique_slopes
 
@@ -85,7 +85,7 @@ from gcd_tools import*    #gcd, positive_continued_fraction_expansion
 # see above for description 
 
 def minimal_edge_paths(a):
-    if len(a) < 1: raise ValueError, "input trivial"
+    if len(a) < 1: raise(ValueError, "input trivial")
 
     k = len(a)
 
@@ -98,33 +98,33 @@ def minimal_edge_paths(a):
     # create paths recursively
 
     while len(paths) != 0:
-	new_paths = []
-	for path in paths:
-	    # check to see if the path has reached the last vertex
-	    
-	    if path[-1] == k:
-		final_paths.append(path)
-		continue
+        new_paths = []
+        for path in paths:
+            # check to see if the path has reached the last vertex
 
-	    # otherwise, there are two possible continuations.   The first is:
+            if path[-1] == k:
+                final_paths.append(path)
+                continue
 
-	    path1 = path[:] + [path[-1] + 1]
+            # otherwise, there are two possible continuations.   The first is:
 
-	    # We check if it is minimal.  A path is minimal as long as
-	    # it doesn't go from j to j + 1 to j + 2 with a_(j+1) = 1.
+            path1 = path[:] + [path[-1] + 1]
 
-	    if not (path1[-3] + 1 == path1[-2] == path1[-1] - 1 and a[path1[-2]] == 1):
-		new_paths.append(path1)
+            # We check if it is minimal.  A path is minimal as long as
+            # it doesn't go from j to j + 1 to j + 2 with a_(j+1) = 1.
 
-	    # the other poss. continuation isn't always possible.
+            if not (path1[-3] + 1 == path1[-2] == path1[-1] - 1 and a[path1[-2]] == 1):
+                new_paths.append(path1)
 
-	    if path[-1] + 2 <= k:
-		path2 = path[:] + [path[-1] + 2]
+            # the other poss. continuation isn't always possible.
 
-		if not (path2[-3] + 1 == path2[-2] == path2[-1] - 1 and a[path2[-2]] == 1):
-		    new_paths.append(path2)
+            if path[-1] + 2 <= k:
+                path2 = path[:] + [path[-1] + 2]
 
-	paths = new_paths[:]
+                if not (path2[-3] + 1 == path2[-2] == path2[-1] - 1 and a[path2[-2]] == 1):
+                    new_paths.append(path2)
+
+        paths = new_paths[:]
 
     return final_paths
 
@@ -137,48 +137,48 @@ def surface_from_path(path, a):   # path, pos cont. frac. exp.
     b = []   # this is the expansion (b_i) in the paper. 
 
     for i in range (1, len(path)):    
-	x, y = path[i - 1], path[i]
+        x, y = path[i - 1], path[i]
 
-	# The associated cont. frac. exp. has one term for each vertex
-	# in the full diagram that the path passes through.
+        # The associated cont. frac. exp. has one term for each vertex
+        # in the full diagram that the path passes through.
 
-	# First we add those b_i corresponding to vertices of the full
-	# diagram in the interior of the edge from x to y.  Then we
-	# add the b_i corresponding to y.
+        # First we add those b_i corresponding to vertices of the full
+        # diagram in the interior of the edge from x to y.  Then we
+        # add the b_i corresponding to y.
 
-	# the sign of b_i is determined by whether the vertex is on
-	# the top or bottom edge of D.
-	
-	if y  %2 == 0:
-	    sign = 1
-	else:
-	    sign = -1
+        # the sign of b_i is determined by whether the vertex is on
+        # the top or bottom edge of D.
 
-	# there are only vertices on the interior of [x,y] if it is
-	# horizontal.  each such vertex contributes +/- 2
-	
-	if y - x == 2:
-	    b = b + [sign*2]*(a[y - 1] - 1)
-	    
-	# now we consider the contribution of y, if y is not the last
-	# vertex in the path
+        if y  %2 == 0:
+            sign = 1
+        else:
+            sign = -1
 
-	if y != len(a):
-	    z = path[i + 1]
+        # there are only vertices on the interior of [x,y] if it is
+        # horizontal.  each such vertex contributes +/- 2
 
-	    # contrib of y is a[y] + c where c = 
+        if y - x == 2:
+            b = b + [sign*2]*(a[y - 1] - 1)
 
-	    if y - x == 1 and z - y == 1:
-		c = 0
-	    if y - x == 1 and z - y == 2:
-		c = 1
-	    if y - x == 2 and z - y == 1:
-		c = 1
-	    if y - x == 2 and z - y == 2:
-		c = 2
+        # now we consider the contribution of y, if y is not the last
+        # vertex in the path
 
-	    b.append(sign*(a[y] + c))
-        
+        if y != len(a):
+            z = path[i + 1]
+
+            # contrib of y is a[y] + c where c = 
+
+            if y - x == 1 and z - y == 1:
+                c = 0
+            if y - x == 1 and z - y == 2:
+                c = 1
+            if y - x == 2 and z - y == 1:
+                c = 1
+            if y - x == 2 and z - y == 2:
+                c = 2
+
+            b.append(sign*(a[y] + c))
+
     s = surface()
     s.expansion = b[:]
     return s
@@ -188,10 +188,10 @@ def surface_from_path(path, a):   # path, pos cont. frac. exp.
 def twist(s):
     n_plus, n_minus = 0, 0
     for b in s.expansion:
-	if b > 0:
-	    n_plus = n_plus + 1
-	else:
-	    n_minus = n_minus + 1
+        if b > 0:
+            n_plus = n_plus + 1
+        else:
+            n_minus = n_minus + 1
     return n_plus - n_minus
 
 
@@ -201,21 +201,21 @@ def twist(s):
 
 def seifert_twist(surfaces):
     for s in surfaces:
-	all_even = 1
-	for b in s.expansion:
-	    if b % 2 == 1:
-		all_even = 0
-	if all_even:
-	    return twist(s)
+        all_even = 1
+        for b in s.expansion:
+            if b % 2 == 1:
+                all_even = 0
+        if all_even:
+            return twist(s)
 
 # this function computes the slope using Prop. 2
 
 def compute_slope(s, twist_of_seifert):
     s.slope = 2 * (twist(s) - twist_of_seifert)
-    
-    
-	
-    
+
+
+
+
 
 
 

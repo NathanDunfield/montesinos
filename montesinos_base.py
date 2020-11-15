@@ -8,6 +8,7 @@ from gcd_tools import *
 # path.  The first is denoted <p/q> in the paper.  I will try to
 # insure that q is always > 0, and the gcd(p,q) = 1.
 
+@total_ordering
 class vertex_of_D:
     # can take either a fraction or a pair of integers
     def __init__(self, p, q="noarg"):
@@ -19,10 +20,16 @@ class vertex_of_D:
     def __repr__(self):
         return "<%s>" % self.frac
 
-    def __cmp__(self, other):
-        if not isinstance(other, vertex_of_D): return 1
-        return cmp(self.frac, other.frac)
-    
+    def __eq__(self, other):
+        if not isinstance(other, vertex_of_D):
+            raise ValueError
+        return self.frac == other.frac
+
+    def __lt__(self, other):
+        if not isinstance(other, vertex_of_D):
+            raise ValueError
+        return self.frac < other.frac
+
     def p(self):
         return self.frac.t
 
@@ -36,39 +43,39 @@ class vertex_of_D:
         return self.frac.copy()
 
     # min num of arcs needed to realize this diagram
-    
+
     def num_arcs(self):
         return 1
-    
+
     # returns the corresponding fraction in the collasped diagram with
     # only three vert.
-    
+
     def reduced(self):
         return  frac(self.frac.t % 2, self.frac.b % 2)
-        
-    
+
+
     # finds the two leftward neighbors of a vertex of T
 
     def leftward_neighbors(self):
         # The two vertices to the left of <p/q> are <r/s>
         # where sp - rq = +/-1 and s < q
-
+        print(self.frac)
         p, q = self.frac.t, self.frac.b
         g, s, r = euclidean_algorithm(p, q)   # 1 = sp + rq
-        if(g != 1) or q <= 1: raise ValueError, "bad vertex %i,%i" % (p,q)
+        if g != 1 or q <= 1: raise ValueError("bad vertex %i,%i" % (p,q))
 
         # change so sp - rq = +/-1 and r > 0
 
         r = -r
         if r < 0: r, s = -r, -s
-        
+
         # all solutions of s'p - r'q = +/-1 are of form
         # s' = (s + aq), r = (r + aq)
-        
-        a = -s/q
+
+        a = -s//q
 
         # return so that the vertex with larger v coordinate is second
-        
+
         ret = [vertex_of_D (r + a*p, s + a*q),  vertex_of_D (r + (a + 1)*p, s + (a + 1)*q)]
         if ret[0] > ret[1]:
             ret.reverse()
@@ -78,12 +85,12 @@ class vertex_of_D:
 
 class interior_of_edge_of_D:
     # takes three fractions to define -- k/m must be between 0 and 1
-    def __init__(self, pq, rs, km):         
+    def __init__(self, pq, rs, km):
         self.pq = pq.copy()
         self.rs = rs.copy()
         self.km = km.copy()
         if not 0 <= km <= 1:
-            raise ValueError, "need 0 <= km <=1"
+            raise ValueError("need 0 <= km <=1")
 
     def p(self):
         return self.pq.t
@@ -100,11 +107,10 @@ class interior_of_edge_of_D:
     def __repr__(self):
         return "%s<%s> + %s<%s>" % (self.km, self.pq, 1 - self.km, self.rs)
 
-    def __cmp__(self, o):
-        if not isinstance(o, interior_of_edge_of_D): return 1
-        if self.pq == o.pq and self.rs == o.rs and self.km == o.km:
-            return 0
-        return 1
+    def __eq__(self, o):
+        if not isinstance(o, interior_of_edge_of_D):
+            raise ValueError
+        return self.pq == o.pq and self.rs == o.rs and self.km == o.km
 
     # min num arcs needed to realize system
     def num_arcs(self):
@@ -112,7 +118,7 @@ class interior_of_edge_of_D:
             return self.km.t
         return self.km.b
 
-        
+
 # Decides if two vertices of D are joined by an edge
 
 def joined_by_edge(v, w):
@@ -130,7 +136,7 @@ class edgepath:
     def __getitem__(self, i): return self.path[i]
 
     def __len__(self): return len(self.path)
-    
+
     def __repr__(self):
         return "tangle: %i,  r = %i, cr = %i, %s" % (self.tangle,
                                               self.r_value, self.completely_reversible, self.path)
@@ -138,10 +144,10 @@ class edgepath:
     def compute_final_r_value(self):
         path = self.path
         if len(path) <= 1: return 0
-    
+
         p, q = path[0].p(), path[0].q()
         r, s =  path[1].p(), path[1].q()
-        
+
         # using that <p, q> has (u,v) coordinates ( (q - 1)/q, p/q ) its
         # easy to calculate that the intersection of the line through <p,
         # q> and <r, s> with the right edge of T (u = 1) is given by:
@@ -151,21 +157,21 @@ class edgepath:
 
         if p*s <  q*r: rr = -rr
         return rr
-    
+
     def decide_reversibility(self):
         path = self.path
-        
+
         # determine if path is completely reversible.  This is the case if
         # for each pair of successive segments of the path lie on
         # triangles of D sharing a common face.
-        
+
         if len(path) <=2: return 1
 
         # change leftmost segment if necessary
 
         if isinstance(path[0], interior_of_edge_of_D):
             path = [vertex_of_D(path[0].p(), path[0].q())] + path[1:]
-          
+
         for i in range(2, len(path)):
             for v in path[i].leftward_neighbors():
                 if not joined_by_edge(v, path[i - 2]): return 0
@@ -188,7 +194,7 @@ class edgepath:
             v, w = path[i], path[i+1]
 
             # fractional twist possible for final edge
-            
+
             if i == 0 and isinstance(v, interior_of_edge_of_D):
                 if v.pq < v.rs:
                     tau = tau + 2*v.km
@@ -202,11 +208,10 @@ class edgepath:
 
         return tau
 
-    def __cmp__(self, o):
-        if not isinstance(o, edgepath): raise TypeError
-        if self.tangle == o.tangle and self.path == o.path:
-            return 0
-        return 1
+    def __eq__(self, o):
+        if not isinstance(o, edgepath):
+            raise TypeError
+        return self.tangle == o.tangle and self.path == o.path
 
     def clone(self):
         return edgepath(self.tangle, self.path)
@@ -219,7 +224,7 @@ class edgepath:
 class branched_surface:
     def __init__(self, paths, type, u):
         self.edgepaths = paths      # a cyclically ordered list of edgepaths (edgepaths[0] not ness. for tangle 0)
-        self.type = type   # I, II, or III        
+        self.type = type   # I, II, or III
         self.u = u              # u coordinate of ending point
         self.twist = self.compute_twist()
         self.slope = "?"
@@ -227,7 +232,7 @@ class branched_surface:
         self.num_sheets = self.comp_sheets()
         self.euler_char = self.comp_euler_char()
         self.from_non_iso_solution =  0   # used only in regression testing against Oretel's ver.
-    
+
     def __repr__(self):
         if self.carries_incompressible:
             s = "type %s incompressible,  " % self.type
@@ -236,22 +241,22 @@ class branched_surface:
         s = s + "u = %s, slope: %s, twist %s, sheets: %i, euler: %i\n" % (self.u,
                                                                                 self.slope, self.twist, self.num_sheets,
                                                                                 self.euler_char)
-        
+
         # we sometimes re-arrange the paths, so print them in the
         # standard order
-        
+
         for i in range(0, len(self.edgepaths)):
             for path in self.edgepaths:
                 if path.tangle == i:
                     s = s + "%s" % path + "\n"
-                    
+
         return s
 
     # with no args, returns the number of edgepaths that are
     # completely reversible.  with arg, which should be a range of
     # numbers, returns the number of edgepaths in that range that are
     # comp. reversible.
-    
+
     def num_reversible(self, r="noarg"):
         num = 0
         if r == "noarg":
@@ -282,14 +287,14 @@ class branched_surface:
         n = len(self.edgepaths)
         sheets = self.num_sheets
         euler_char = 0
-        
+
         #compute euler char of each piece seperately, add together
-        
+
         for path in self.edgepaths:
             # base disks
             if len(path) == 1 and isinstance(path[0], interior_of_edge_of_D):
                 k , m = path[0].km.t, path[0].km.b
-                euler_char = euler_char + 2*sheets + (m-k)*(sheets/k)   # = 2m arcs + m - k circles
+                euler_char = euler_char + 2*sheets + (m-k)*(sheets//k)   # = 2m arcs + m - k circles
             else:
                 euler_char = euler_char + 2*sheets
 
@@ -307,15 +312,15 @@ class branched_surface:
                 num_saddles = num_saddles + sheets * (len(path) - 2)
 
             euler_char = euler_char - num_saddles
-            
+
         # adjustments for additional saddles
-        
+
         if self.type == "II":
             sum_of_endpoints = 0
             for path in self.edgepaths:
                 sum_of_endpoints = sum_of_endpoints + path[0].p()
             euler_char = euler_char -  abs(sum_of_endpoints)*sheets  # adjustment for vert. edges
-            
+
         if self.type  == "III":
             euler_char = euler_char -  sheets*n  # adjustment for additional saddles going to infinity
 
@@ -325,7 +330,7 @@ class branched_surface:
             euler_char = euler_char  - sheets*n  # adjustment for glueing
 
         if self.type == "I":
-            
+
             # we need to know how we glue components which end in arcs
             # together as we go from tangle to tangle (we can ignore
             # those ending in circles because there is no change in
@@ -348,7 +353,7 @@ class branched_surface:
                 if v.pq == v.rs:
                     C = (sheets/k)*(k*(v.q() + 1) + (m - k)*v.q())
                 else:
-                    C = k*sheets/m*(v.q() + 1) + (m - k)*sheets/m*(v.s() + 1)                    
+                    C = k*sheets/m*(v.q() + 1) + (m - k)*sheets/m*(v.s() + 1)
             else:
                 C = (v.q() + 1)*sheets
 
@@ -362,12 +367,12 @@ class branched_surface:
 
         if self.type == "II":
             euler_char = euler_char - 2*sheets*(n-1)   # see above
-             
+
         return euler_char
-            
+
     # cyclically permutes the paths so that the current ith one is
     # made the _last_ one
-    
+
     def cycle_paths_so_last(self, i):
         i = i % len(self.edgepaths)
         self.edgepaths = self.edgepaths[i+1:] + self.edgepaths[:i] + [ self.edgepaths[i]]
@@ -379,22 +384,21 @@ class branched_surface:
         ans = [E.r_value for E in self.edgepaths]
         ans.sort()
         return ans
-        
+
     # gets ith path with cycle ordering
     def __getitem__(self, i):
         return self.edgepaths[i % len(self.edgepaths)]
 
-    def __cmp__(self, o):
-        if self.type == o.type and self.u == o.u and self.edgepaths == o.edgepaths:
-            return 0
-        return 1
-        
+    def __eq__(self, o):
+        return self.type == o.type and self.u == o.u and self.edgepaths == o.edgepaths
+
+
 # For each tangle we will need a tree in order to determine the Type I
 # solutions.  Each node consists of a vertex with links to its two
 # leftward neighbors and a link rightward vertex it came from.
 
 class node:
-    def __init__(self, vertex, back):  
+    def __init__(self, vertex, back):
         self.vertex = vertex
         self.leftward = [None, None]
         self.back = back              # back to the right
@@ -427,7 +431,7 @@ class conway_sphere:
     num_sheets = "Conway Sphere"
     euler_char = -2
     from_non_iso_solution = 0
-        
+
 # Takes a list of lists [L_1, ... , L_n] and outputs a list consisting
 # of all points in the cartesian product of the L1, i.e. every list
 # whose ith element is in L_i
