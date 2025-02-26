@@ -73,7 +73,7 @@ while 1:
             tangles = []
             inp = get_input()[:-1]
             try:
-                for item in re.split("\s+", inp):
+                for item in re.split(r"\s+", inp):
                     tangles.append(gcd_tools.string_to_frac(item))
             except:
                 out("Sorry, input not understood.\n")
